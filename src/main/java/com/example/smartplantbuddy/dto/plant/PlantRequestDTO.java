@@ -1,36 +1,17 @@
-package com.example.smartplantbuddy.model;
+package com.example.smartplantbuddy.dto.plant;
 
 import com.example.smartplantbuddy.controller.enums.Light;
-import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Set;
 
-@Table
-@Entity
-@Data
-public class Plant {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class PlantRequestDTO {
     private String name;
-    private String imageUrl;
+    private MultipartFile plantImage;
     private LocalDateTime wateringTime;
     private LocalDateTime wateringFrequency;
     private Light lightAccess;
     private int lightScore;
-
-    @ManyToMany(mappedBy = "plants")
-    private Set<User> users;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -40,12 +21,12 @@ public class Plant {
         this.name = name;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public MultipartFile getPlantImage() {
+        return plantImage;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setPlantImage(MultipartFile plantImage) {
+        this.plantImage = plantImage;
     }
 
     public LocalDateTime getWateringTime() {
@@ -78,13 +59,5 @@ public class Plant {
 
     public void setLightScore(int lightScore) {
         this.lightScore = lightScore;
-    }
-
-    public Set<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<User> users) {
-        this.users = users;
     }
 }

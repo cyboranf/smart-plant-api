@@ -1,28 +1,19 @@
-package com.example.smartplantbuddy.model;
+package com.example.smartplantbuddy.dto.plant;
 
 import com.example.smartplantbuddy.controller.enums.Light;
-import lombok.*;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-@Table
-@Entity
-@Data
-public class Plant {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class PlantResponseDTO {
     private Long id;
     private String name;
-    private String imageUrl;
+    private String plantImageUrl;
     private LocalDateTime wateringTime;
     private LocalDateTime wateringFrequency;
     private Light lightAccess;
     private int lightScore;
-
-    @ManyToMany(mappedBy = "plants")
-    private Set<User> users;
+    private Set<Long> userIds;
 
     public Long getId() {
         return id;
@@ -40,12 +31,12 @@ public class Plant {
         this.name = name;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getPlantImageUrl() {
+        return plantImageUrl;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setPlantImageUrl(String plantImageUrl) {
+        this.plantImageUrl = plantImageUrl;
     }
 
     public LocalDateTime getWateringTime() {
@@ -64,8 +55,8 @@ public class Plant {
         this.wateringFrequency = wateringFrequency;
     }
 
-    public Light getLightAccess() {
-        return lightAccess;
+    public String getLightAccess() {
+        return lightAccess.toString();
     }
 
     public void setLightAccess(Light lightAccess) {
@@ -79,12 +70,11 @@ public class Plant {
     public void setLightScore(int lightScore) {
         this.lightScore = lightScore;
     }
-
-    public Set<User> getUsers() {
-        return users;
+    public Set<Long> getUserIds() {
+        return userIds;
     }
 
-    public void setUsers(Set<User> users) {
-        this.users = users;
+    public void setUserIds(Set<Long> userIds) {
+        this.userIds = userIds;
     }
 }

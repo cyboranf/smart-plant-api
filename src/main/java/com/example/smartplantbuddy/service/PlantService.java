@@ -18,9 +18,5 @@ public class PlantService {
         this.plantMapper = plantMapper;
     }
 
-    public List<Plant> findAll() {
-        return plantRepository.findAll();
-    }
-
 
 }
