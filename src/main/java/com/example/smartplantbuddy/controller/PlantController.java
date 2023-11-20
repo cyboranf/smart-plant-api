@@ -16,12 +16,6 @@ public class PlantController {
         this.plantService = plantService;
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<Plant>> findAll() {
-        List<Plant> plants = plantService.findAll();
-        return ResponseEntity.ok(plants);
-    }
-
 
 
 }
