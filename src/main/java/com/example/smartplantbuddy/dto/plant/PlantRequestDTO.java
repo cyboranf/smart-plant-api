@@ -1,6 +1,6 @@
 package com.example.smartplantbuddy.dto.plant;
 
-import com.example.smartplantbuddy.controller.enums.Light;
+import com.example.smartplantbuddy.model.enums.Light;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;

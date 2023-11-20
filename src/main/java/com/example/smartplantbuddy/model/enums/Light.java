@@ -1,4 +1,4 @@
-package com.example.smartplantbuddy.controller.enums;
+package com.example.smartplantbuddy.model.enums;
 
 public enum Light {
     EXCELLENT,

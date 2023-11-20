@@ -1,6 +1,6 @@
 package com.example.smartplantbuddy.dto.plant;
 
-import com.example.smartplantbuddy.controller.enums.Light;
+import com.example.smartplantbuddy.model.enums.Light;
 
 import java.time.LocalDateTime;
 import java.util.Set;

@@ -1,6 +1,6 @@
 package com.example.smartplantbuddy.model;
 
-import com.example.smartplantbuddy.controller.enums.Light;
+import com.example.smartplantbuddy.model.enums.Light;
 import lombok.*;
 
 import javax.persistence.*;
