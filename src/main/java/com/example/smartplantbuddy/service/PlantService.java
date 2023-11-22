@@ -1,20 +1,20 @@
 package com.example.smartplantbuddy.service;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.example.smartplantbuddy.dto.plant.PlantRequestDTO;
 import com.example.smartplantbuddy.dto.plant.PlantResponseDTO;
 import com.example.smartplantbuddy.exception.plant.ImageEmptyException;
 import com.example.smartplantbuddy.mapper.PlantMapper;
 import com.example.smartplantbuddy.model.Plant;
 import com.example.smartplantbuddy.repository.PlantRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -22,26 +22,28 @@ import java.util.UUID;
 public class PlantService {
     private final PlantRepository plantRepository;
     private final PlantMapper plantMapper;
+    private final AmazonS3 s3client;
 
-    private final String imageDirectory = "uploaded-images/";
+    @Value("${cloud.aws.bucket.name}")
+    private String bucketName;
 
-    public PlantService(PlantRepository plantRepository, PlantMapper plantMapper) {
+    public PlantService(PlantRepository plantRepository, PlantMapper plantMapper, AmazonS3 s3client) {
         this.plantRepository = plantRepository;
         this.plantMapper = plantMapper;
+        this.s3client = s3client;
     }
 
     public PlantResponseDTO uploadImages(PlantRequestDTO requestDTO) throws IOException {
         MultipartFile file = requestDTO.getPlantImage();
-
         if (file.isEmpty()) {
-            throw new ImageEmptyException("You didn't send image which You want to upload.");
+            throw new ImageEmptyException("You didn't send an image which You want to upload.");
         }
 
-        String fileName = generateUniqueFileName(file.getName());
-        saveFile(file, fileName);
+        String fileName = generateUniqueFileName(file.getOriginalFilename());
+        String s3Path = uploadFileToS3(file, fileName);
 
         Plant plant = plantMapper.toEntity(requestDTO);
-        plant.setImageUrl(imageDirectory + fileName);
+        plant.setImageUrl(s3Path);
 
         Plant savedPlant = plantRepository.save(plant);
         return plantMapper.toDTO(savedPlant);
@@ -51,13 +53,15 @@ public class PlantService {
         return UUID.randomUUID().toString() + "_" + originalFilename;
     }
 
-    private void saveFile(MultipartFile file, String fileName) throws IOException {
-        Path destinationFilePath = Paths.get(imageDirectory + fileName);
+    private String uploadFileToS3(MultipartFile file, String fileName) throws IOException {
+        File tempFile = File.createTempFile("temp", null);
+        file.transferTo(tempFile);
 
-        // Ensure the directory exists
-        Files.createDirectories(destinationFilePath.getParent());
+        String s3Path = "plants/" + fileName;
+        s3client.putObject(new PutObjectRequest(bucketName, s3Path, tempFile));
 
-        // Save the file
-        Files.copy(file.getInputStream(), destinationFilePath);
+        tempFile.deleteOnExit();
+
+        return "https://" + bucketName + ".s3.amazonaws.com/" + s3Path;
     }
 }
