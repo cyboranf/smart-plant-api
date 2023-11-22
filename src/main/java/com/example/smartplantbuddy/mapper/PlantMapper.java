@@ -3,8 +3,10 @@ package com.example.smartplantbuddy.mapper;
 import com.example.smartplantbuddy.dto.plant.PlantRequestDTO;
 import com.example.smartplantbuddy.dto.plant.PlantResponseDTO;
 import com.example.smartplantbuddy.model.Plant;
+import com.example.smartplantbuddy.model.User;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 @Component
@@ -32,11 +34,13 @@ public class PlantMapper {
         responseDTO.setWateringFrequency(plant.getWateringFrequency());
         responseDTO.setLightAccess(plant.getLightAccess());
         responseDTO.setLightScore(plant.getLightScore());
-        responseDTO.setUserIds(plant.getUsers().
-                stream().
-                map(user -> user.getId()).
-                collect(Collectors.toSet()));
-
+        if (plant.getUsers() != null) { // Check for null
+            responseDTO.setUserIds(plant.getUsers().stream()
+                    .map(User::getId)
+                    .collect(Collectors.toSet()));
+        } else {
+            responseDTO.setUserIds(new HashSet<>()); // Set an empty set if users is null
+        }
 
         return responseDTO;
     }

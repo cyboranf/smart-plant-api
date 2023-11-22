@@ -2,9 +2,11 @@ package com.example.smartplantbuddy.model;
 
 import com.example.smartplantbuddy.model.enums.Light;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Table
@@ -16,13 +18,15 @@ public class Plant {
     private Long id;
     private String name;
     private String imageUrl;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime wateringTime;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime wateringFrequency;
     private Light lightAccess;
     private int lightScore;
 
     @ManyToMany(mappedBy = "plants")
-    private Set<User> users;
+    private Set<User> users = new HashSet<>();
 
     public Long getId() {
         return id;

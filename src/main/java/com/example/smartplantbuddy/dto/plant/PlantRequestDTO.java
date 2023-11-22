@@ -1,6 +1,7 @@
 package com.example.smartplantbuddy.dto.plant;
 
 import com.example.smartplantbuddy.model.enums.Light;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
@@ -8,7 +9,9 @@ import java.time.LocalDateTime;
 public class PlantRequestDTO {
     private String name;
     private MultipartFile plantImage;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime wateringTime;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime wateringFrequency;
     private Light lightAccess;
     private int lightScore;
