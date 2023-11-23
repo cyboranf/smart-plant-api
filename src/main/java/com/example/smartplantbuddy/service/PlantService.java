@@ -46,6 +46,7 @@ public class PlantService {
         plant.setImageUrl(s3Path);
 
         Plant savedPlant = plantRepository.save(plant);
+
         return plantMapper.toDTO(savedPlant);
     }
 
