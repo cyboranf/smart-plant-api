@@ -20,9 +20,9 @@ public class RegisterValidator {
     }
 
     public void registerValidation(RegisterRequestDTO registerRequestDTO) {
-        userRepository.findByLogin(registerRequestDTO.getLogin())
-                .orElseThrow(() -> new ExistingLoginException("Account with the same login is already exist."));
-
+        if (!userRepository.findByLogin(registerRequestDTO.getLogin()).isEmpty()) {
+            throw new ExistingLoginException("Account with login: " + registerRequestDTO.getLogin() + " is already exists.");
+        }
         if (registerRequestDTO.getLogin().length() <= 6 || registerRequestDTO.getLogin().length() > 12) {
             throw new InvalidLoginException("Login must have between 6 and 12 characters length.");
         }
