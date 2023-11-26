@@ -2,7 +2,7 @@ package com.example.smartplantbuddy.mapper;
 
 import com.example.smartplantbuddy.dto.register.RegisterRequestDTO;
 import com.example.smartplantbuddy.dto.register.RegisterResponseDTO;
-import com.example.smartplantbuddy.exception.register.InvalidRoleException;
+
 import com.example.smartplantbuddy.exception.register.PasswordNotMatchingException;
 import com.example.smartplantbuddy.model.Role;
 import com.example.smartplantbuddy.model.User;
@@ -11,8 +11,6 @@ import com.example.smartplantbuddy.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import javax.management.relation.RoleNotFoundException;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 

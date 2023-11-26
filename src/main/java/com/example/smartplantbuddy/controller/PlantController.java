@@ -7,6 +7,9 @@ import com.example.smartplantbuddy.service.PlantService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/plant")
 public class PlantController {
@@ -26,6 +29,12 @@ public class PlantController {
         } catch (Exception e) {
             return new ResponseEntity<>("An error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<PlantResponseDTO>> showAll() {
+        List<PlantResponseDTO> plants = plantService.getPlants();
+        return ResponseEntity.ok(plants);
     }
 
 }
