@@ -20,75 +20,9 @@ public class Plant {
     private String imageUrl;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime wateringTime;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime wateringFrequency;
+    private int wateringFrequency; // because it is in hours
     private Light lightAccess;
     private int lightScore;
-
     @ManyToMany(mappedBy = "plants")
     private Set<User> users = new HashSet<>();
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public LocalDateTime getWateringTime() {
-        return wateringTime;
-    }
-
-    public void setWateringTime(LocalDateTime wateringTime) {
-        this.wateringTime = wateringTime;
-    }
-
-    public LocalDateTime getWateringFrequency() {
-        return wateringFrequency;
-    }
-
-    public void setWateringFrequency(LocalDateTime wateringFrequency) {
-        this.wateringFrequency = wateringFrequency;
-    }
-
-    public Light getLightAccess() {
-        return lightAccess;
-    }
-
-    public void setLightAccess(Light lightAccess) {
-        this.lightAccess = lightAccess;
-    }
-
-    public int getLightScore() {
-        return lightScore;
-    }
-
-    public void setLightScore(int lightScore) {
-        this.lightScore = lightScore;
-    }
-
-    public Set<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<User> users) {
-        this.users = users;
-    }
 }
