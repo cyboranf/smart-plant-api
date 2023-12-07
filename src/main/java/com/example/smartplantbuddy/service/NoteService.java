@@ -15,7 +15,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -61,5 +63,9 @@ public class NoteService {
         tempFile.deleteOnExit();
 
         return "https://" + bucketName + ".s3.amazonaws.com/" + s3Path;
+    }
+    public List<NoteResponseDTO> findAllNotesByPlantId(Long plantId) {
+        List<Note> notes = noteRepository.findAllByPlantId(plantId);
+        return notes.stream().map(noteMapper::toDTO).collect(Collectors.toList());
     }
 }

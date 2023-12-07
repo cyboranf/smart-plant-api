@@ -43,6 +43,9 @@ public class LoginController {
 
         response.setHeader("Set-Cookie", cookieString);
 
-        return ResponseEntity.ok(new LoginResponseDTO(jwt));
+        LoginResponseDTO loginResponseDTO = new LoginResponseDTO(jwt);
+        loginResponseDTO.setLogin(loginRequestDTO.getLogin());
+
+        return ResponseEntity.ok(loginResponseDTO);
     }
 }

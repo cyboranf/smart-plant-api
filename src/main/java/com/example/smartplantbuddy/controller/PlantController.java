@@ -49,5 +49,13 @@ public class PlantController {
             return new ResponseEntity<>("An error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
+    @GetMapping("/{plantId}/notes")
+    public ResponseEntity<?> getAllNotesForPlant(@PathVariable Long plantId) {
+        try {
+            List<NoteResponseDTO> notes = noteService.findAllNotesByPlantId(plantId);
+            return new ResponseEntity<>(notes, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

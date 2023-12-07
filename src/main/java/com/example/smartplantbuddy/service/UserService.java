@@ -1,5 +1,7 @@
 package com.example.smartplantbuddy.service;
 
+import com.example.smartplantbuddy.exception.user.UsernameNotFoundException;
+import com.example.smartplantbuddy.model.User;
 import com.example.smartplantbuddy.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -13,4 +15,5 @@ public class UserService {
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
+
 }

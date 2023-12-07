@@ -36,12 +36,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/swagger-ui/**", "/swagger-resources/**", "/v2/api-docs", "/v3/api-docs/**", "/webjars/**")
                 .permitAll()
 
+                .antMatchers("/api/user/isUser").permitAll()
+
                 .antMatchers(HttpMethod.POST, "/api/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/signup").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/plant/upload").permitAll() // authentication to change
                 .antMatchers(HttpMethod.GET, "/api/plant/all").permitAll() // authentication to change
                 .antMatchers(HttpMethod.POST, "/api/plant/addNote").permitAll() // authentication to change
-
+                .antMatchers(HttpMethod.GET, "/api/plant/{plantId}/notes").permitAll() // authentication to change
                 .anyRequest().authenticated()
                 .and()
                 .apply(new JwtConfigurer(jwtTokenProvider));
