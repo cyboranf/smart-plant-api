@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Table
@@ -25,4 +26,6 @@ public class Plant {
     private int lightScore;
     @ManyToMany(mappedBy = "plants")
     private Set<User> users = new HashSet<>();
+    @OneToMany(mappedBy = "plant", cascade = CascadeType.ALL)
+    private List<Note> notes;
 }
