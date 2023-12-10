@@ -29,10 +29,7 @@ public class UserController {
             String username = jwtTokenProvider.getUsername(token);
 
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
-            boolean isUserOrGuest = authentication.getAuthorities().stream()
-                    .anyMatch(grantedAuthority ->
-                            "ROLE_USER".equals(grantedAuthority.getAuthority()));
-            if (isUserOrGuest) {
+            if (authentication.isAuthenticated()) {
                 Map<String, String> response = new HashMap<>();
                 response.put("message", "Welcome back, " + username);
                 return ResponseEntity.ok(response);

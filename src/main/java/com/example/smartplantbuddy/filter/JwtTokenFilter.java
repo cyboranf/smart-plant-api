@@ -22,7 +22,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestURI = request.getRequestURI();
 
-        if ("/api/users/register".equals(requestURI) || "/api/users/login".equals(requestURI)) {
+        if ("/api/signup".equals(requestURI) || "/api/login".equals(requestURI)) {
             filterChain.doFilter(request, response);
             return;
         }
