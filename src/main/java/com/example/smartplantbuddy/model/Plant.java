@@ -28,4 +28,7 @@ public class Plant {
     private Set<User> users = new HashSet<>();
     @OneToMany(mappedBy = "plant", cascade = CascadeType.ALL)
     private List<Note> notes;
+    private int fertilizingFrequency; // in hours
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime fertilizingTime;
 }

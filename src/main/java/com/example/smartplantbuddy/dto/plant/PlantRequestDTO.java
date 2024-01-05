@@ -16,4 +16,7 @@ public class PlantRequestDTO {
     private int wateringFrequency; // bcs quantity of hours
     private Light lightAccess;
     private int lightScore;
+    private int fertilizingFrequency; // in hours
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime fertilizingTime;
 }

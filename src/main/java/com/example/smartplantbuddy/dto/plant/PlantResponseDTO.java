@@ -18,4 +18,7 @@ public class PlantResponseDTO {
     private Light lightAccess;
     private int lightScore;
     private Set<Long> userIds;
+    private int fertilizingFrequency; // in hours
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime fertilizingTime;
 }

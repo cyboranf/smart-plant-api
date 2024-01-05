@@ -20,6 +20,8 @@ public class PlantMapper {
         plant.setWateringFrequency(dto.getWateringFrequency());
         plant.setLightAccess(dto.getLightAccess());
         plant.setLightScore(dto.getLightScore());
+        plant.setFertilizingFrequency(dto.getFertilizingFrequency());
+        plant.setFertilizingTime(dto.getFertilizingTime());
 
         return plant;
     }
@@ -34,6 +36,8 @@ public class PlantMapper {
         responseDTO.setWateringFrequency(plant.getWateringFrequency());
         responseDTO.setLightAccess(plant.getLightAccess());
         responseDTO.setLightScore(plant.getLightScore());
+        responseDTO.setFertilizingFrequency(plant.getFertilizingFrequency());
+        responseDTO.setFertilizingTime(plant.getFertilizingTime());
         if (plant.getUsers() != null) { // Check for null
             responseDTO.setUserIds(plant.getUsers().stream()
                     .map(User::getId)
