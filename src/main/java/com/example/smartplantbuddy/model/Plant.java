@@ -33,4 +33,6 @@ public class Plant {
     private int fertilizingFrequency; // in hours
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime fertilizingTime;
+    @OneToMany(mappedBy = "plant", cascade = CascadeType.ALL)
+    private List<Gallery> galleries;
 }

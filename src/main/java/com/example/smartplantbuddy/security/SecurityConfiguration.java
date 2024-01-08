@@ -40,7 +40,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/user/isUser").hasAuthority("USER")
                 .antMatchers("/error").permitAll()
 
-
+                .antMatchers(HttpMethod.POST, "/api/gallery/add").hasAuthority("USER")
 
                 .antMatchers(HttpMethod.POST, "/api/signup").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/plant/upload").permitAll() // authentication to change
