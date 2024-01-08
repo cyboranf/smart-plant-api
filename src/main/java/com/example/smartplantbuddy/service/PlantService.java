@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.example.smartplantbuddy.dto.plant.PlantRequestDTO;
 import com.example.smartplantbuddy.dto.plant.PlantResponseDTO;
 import com.example.smartplantbuddy.exception.plant.ImageEmptyException;
+import com.example.smartplantbuddy.exception.plant.PlantNotFoundException;
 import com.example.smartplantbuddy.mapper.PlantMapper;
 import com.example.smartplantbuddy.model.Plant;
 import com.example.smartplantbuddy.repository.PlantRepository;
@@ -75,5 +76,29 @@ public class PlantService {
         return plantRepository.findAll().stream()
                 .map(plantMapper::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    public PlantResponseDTO updatePlant(Long plantId, PlantRequestDTO requestDTO) {
+        Plant plant = plantRepository.findById(plantId)
+                .orElseThrow(() -> new PlantNotFoundException("Plant with id " + plantId + " not found"));
+
+        plant.setName(requestDTO.getName());
+        plant.setDescription(requestDTO.getDescription());
+        plant.setWateringTime(requestDTO.getWateringTime());
+        plant.setWateringFrequency(requestDTO.getWateringFrequency());
+        plant.setLightAccess(requestDTO.getLightAccess());
+        plant.setLightScore(requestDTO.getLightScore());
+        plant.setFertilizingFrequency(requestDTO.getFertilizingFrequency());
+        plant.setFertilizingTime(requestDTO.getFertilizingTime());
+
+        Plant updatedPlant = plantRepository.save(plant);
+        return plantMapper.toDTO(updatedPlant);
+    }
+
+    public void deletePlant(Long plantId) {
+        if (!plantRepository.existsById(plantId)) {
+            throw new PlantNotFoundException("Plant with id " + plantId + " not found");
+        }
+        plantRepository.deleteById(plantId);
     }
 }

@@ -40,11 +40,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/user/isUser").permitAll()
                 .antMatchers("/error").permitAll()
 
+
+
                 .antMatchers(HttpMethod.POST, "/api/signup").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/plant/upload").permitAll() // authentication to change
                 .antMatchers(HttpMethod.GET, "/api/plant/all").permitAll() // authentication to change
                 .antMatchers(HttpMethod.POST, "/api/plant/addNote").permitAll() // authentication to change
                 .antMatchers(HttpMethod.GET, "/api/plant/{plantId}/notes").permitAll() // authentication to change
+                .antMatchers(HttpMethod.DELETE, "/api/plant/delete/{plantId}").permitAll() // authentication to change
+                .antMatchers(HttpMethod.PUT, "/api/plant/update/{plantId}").permitAll() // authentication to change
+
                 .anyRequest().authenticated()
                 .and()
                 .apply(new JwtConfigurer(jwtTokenProvider));

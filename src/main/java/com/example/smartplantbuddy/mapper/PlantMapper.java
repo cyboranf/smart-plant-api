@@ -21,6 +21,7 @@ public class PlantMapper {
         plant.setLightAccess(dto.getLightAccess());
         plant.setLightScore(dto.getLightScore());
         plant.setFertilizingFrequency(dto.getFertilizingFrequency());
+        plant.setDescription(dto.getDescription());
         plant.setFertilizingTime(dto.getFertilizingTime());
 
         return plant;
@@ -31,6 +32,7 @@ public class PlantMapper {
 
         responseDTO.setId(plant.getId());
         responseDTO.setName(plant.getName());
+        responseDTO.setDescription(plant.getDescription());
         responseDTO.setPlantImageUrl(plant.getImageUrl());
         responseDTO.setWateringTime(plant.getWateringTime());
         responseDTO.setWateringFrequency(plant.getWateringFrequency());

@@ -9,11 +9,14 @@ import com.example.smartplantbuddy.security.JwtTokenProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.stream.Collectors;
 
 @RestController
@@ -28,18 +31,19 @@ public class UserController {
     }
 
     @GetMapping("/isUser")
-    public ResponseEntity<?> isUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
-            String username = authentication.getName();
-            User user = userRepository.findUserByLogin(username);
-            if (user != null) {
+    public ResponseEntity<?> isUser(HttpServletRequest request) {
+        String token = jwtTokenProvider.resolveToken(request);
+        if (jwtTokenProvider.validateToken(token)) {
+            Authentication auth = jwtTokenProvider.getAuthentication(token);
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
+            User user = userRepository.findUserByLogin(auth.getName());
+            if (user != null && auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_USER"))) {
                 UserResponseDTO userResponseDTO = mapToUserResponseDTO(user);
                 return ResponseEntity.ok(userResponseDTO);
             }
         }
-        return new ResponseEntity<String>("The String ResponseBody with custom status code (403 Forbidden)",
-                HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>("User must log in to their account", HttpStatus.FORBIDDEN);
     }
 
     private UserResponseDTO mapToUserResponseDTO(User user) {

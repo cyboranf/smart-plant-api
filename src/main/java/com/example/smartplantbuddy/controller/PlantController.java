@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/plant")
@@ -58,4 +59,29 @@ public class PlantController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @PutMapping("/update/{plantId}")
+    public ResponseEntity<?> updatePlant(@PathVariable Long plantId, @ModelAttribute PlantRequestDTO requestDTO) {
+        try {
+            PlantResponseDTO updatedPlant = plantService.updatePlant(plantId, requestDTO);
+            return new ResponseEntity<>(updatedPlant, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>("Plant not found", HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("An error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/delete/{plantId}")
+    public ResponseEntity<?> deletePlant(@PathVariable Long plantId) {
+        try {
+            plantService.deletePlant(plantId);
+            return new ResponseEntity<>("Plant deleted successfully", HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>("Plant not found", HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("An error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 }

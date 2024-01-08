@@ -80,25 +80,23 @@ public class JwtTokenProvider {
         jwtSecret = new SecretKeySpec(decodedKey, 0, decodedKey.length, "HmacSHA512");
     }
 
-    public String getUsername(String token) {
-        return Jwts.parserBuilder().setSigningKey(jwtSecret).build().parseClaimsJwt(token).getBody().getSubject();
-    }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(jwtSecret).build().parseClaimsJwt(token);
+            Jwts.parserBuilder().setSigningKey(jwtSecret).build().parseClaimsJws(token);
             return true;
-        } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException | SignatureException |
-                 ExpiredJwtException e) {
+        } catch (JwtException e) {
+            System.out.println("JWT validation error: " + e.getMessage());
             return false;
         }
     }
+
 
     public Authentication getAuthentication(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(jwtSecret)
                 .build()
-                .parseClaimsJwt(token)
+                .parseClaimsJws(token) // Change this line
                 .getBody();
 
         Collection<? extends GrantedAuthority> authorities =
