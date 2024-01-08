@@ -19,6 +19,8 @@ public class Plant {
     private Long id;
     private String name;
     private String imageUrl;
+    private String description;
+
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime wateringTime;
     private int wateringFrequency; // because it is in hours

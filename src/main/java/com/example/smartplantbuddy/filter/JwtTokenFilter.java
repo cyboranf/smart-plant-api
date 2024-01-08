@@ -19,17 +19,18 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String requestURI = request.getRequestURI();
-
-        if ("/api/signup".equals(requestURI) || "/api/login".equals(requestURI)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
         String token = jwtTokenProvider.resolveToken(request);
         if (token != null && jwtTokenProvider.validateToken(token)) {
             Authentication auth = jwtTokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(auth);
+
+            // Debugging
+            System.out.println("Token processed for user: " + auth.getName());
+            System.out.println("Authorities: " + auth.getAuthorities().toString());
+        } else {
+            System.out.println("No valid JWT token found, proceeding as anonymous user.");
         }
         filterChain.doFilter(request, response);
     }

@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public class PlantRequestDTO {
     private String name;
     private MultipartFile plantImage;
+    private String description;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime wateringTime;
     private int wateringFrequency; // bcs quantity of hours

@@ -12,6 +12,7 @@ public class PlantResponseDTO {
     private Long id;
     private String name;
     private String plantImageUrl;
+    private String description;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime wateringTime;
     private int wateringFrequency; // bcs quantity of hours
