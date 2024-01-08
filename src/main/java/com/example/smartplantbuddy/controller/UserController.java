@@ -1,6 +1,7 @@
 package com.example.smartplantbuddy.controller;
 
 import com.example.smartplantbuddy.dto.user.UserResponseDTO;
+import com.example.smartplantbuddy.exception.user.UsernameNotFoundException;
 import com.example.smartplantbuddy.model.Plant;
 import com.example.smartplantbuddy.model.Role;
 import com.example.smartplantbuddy.model.User;
@@ -31,19 +32,11 @@ public class UserController {
     }
 
     @GetMapping("/isUser")
-    public ResponseEntity<?> isUser(HttpServletRequest request) {
-        String token = jwtTokenProvider.resolveToken(request);
-        if (jwtTokenProvider.validateToken(token)) {
-            Authentication auth = jwtTokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(auth);
-
-            User user = userRepository.findUserByLogin(auth.getName());
-            if (user != null && auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_USER"))) {
-                UserResponseDTO userResponseDTO = mapToUserResponseDTO(user);
-                return ResponseEntity.ok(userResponseDTO);
-            }
-        }
-        return new ResponseEntity<>("User must log in to their account", HttpStatus.FORBIDDEN);
+    public ResponseEntity<?> isUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userRepository.findByLogin(authentication.getName())
+                .orElseThrow(() -> new UsernameNotFoundException("User with given username not found"));
+        return ResponseEntity.ok(mapToUserResponseDTO(user));
     }
 
     private UserResponseDTO mapToUserResponseDTO(User user) {
