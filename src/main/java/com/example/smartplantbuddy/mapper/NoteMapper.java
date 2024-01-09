@@ -35,8 +35,7 @@ public class NoteMapper {
         noteResponseDTO.setTime(note.getTime());
         noteResponseDTO.setNote(note.getNote());
         noteResponseDTO.setPlantId(note.getPlant().getId());
-        noteResponseDTO.setPlantImageUrl(note.getPlant().getImageUrl());
+        noteResponseDTO.setPlantImageUrl(note.getImageUrl());
         return noteResponseDTO;
     }
-
 }

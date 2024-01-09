@@ -15,6 +15,7 @@ public class NoteRequestDTO {
     @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
     private LocalTime time;
     private String note;
+    @Nullable
     private Long plantId;
     @Nullable
     private MultipartFile plantImage;

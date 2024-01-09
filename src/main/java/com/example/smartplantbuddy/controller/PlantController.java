@@ -41,24 +41,7 @@ public class PlantController {
         List<PlantResponseDTO> plants = plantService.getPlants();
         return ResponseEntity.ok(plants);
     }
-    @PostMapping("/addNote")
-    public ResponseEntity<?> addNoteToPlant(@ModelAttribute NoteRequestDTO requestDTO) {
-        try {
-            NoteResponseDTO responseDTO = noteService.addNoteToPlant(requestDTO);
-            return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>("An error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-    @GetMapping("/{plantId}/notes")
-    public ResponseEntity<?> getAllNotesForPlant(@PathVariable Long plantId) {
-        try {
-            List<NoteResponseDTO> notes = noteService.findAllNotesByPlantId(plantId);
-            return new ResponseEntity<>(notes, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+
     @PutMapping("/update/{plantId}")
     public ResponseEntity<?> updatePlant(@PathVariable Long plantId, @ModelAttribute PlantRequestDTO requestDTO) {
         try {
@@ -82,6 +65,4 @@ public class PlantController {
             return new ResponseEntity<>("An error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
 }
