@@ -23,6 +23,16 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Provides services for managing notes associated with plants.
+ * This service handles the creation, updating, and deletion of plant notes,
+ * as well as uploading associated images to Amazon S3 and retrieving notes by plant ID.
+ * Images are managed in the cloud, providing a centralized location for note-related media.
+ *
+ * @author cyboranf
+ * @version 1.0
+ * @since 1.0
+ */
 @Service
 @Transactional
 public class NoteService {
@@ -40,7 +50,13 @@ public class NoteService {
         this.plantRepository = plantRepository;
         this.s3client = s3client;
     }
-
+    /**
+     * Creates a new note associated with a plant and optionally uploads an image to Amazon S3.
+     *
+     * @param requestDTO The DTO containing the note details and optional image.
+     * @return The response DTO containing details of the created note.
+     * @throws IOException if an I/O error occurs during file upload.
+     */
     public NoteResponseDTO addNoteToPlant(NoteRequestDTO requestDTO) throws IOException {
         MultipartFile file = requestDTO.getPlantImage();
         Note note = noteMapper.toEntity(requestDTO);
@@ -54,11 +70,23 @@ public class NoteService {
         Note savedNote = noteRepository.save(note);
         return noteMapper.toDTO(savedNote);
     }
-
+    /**
+     * Generates a unique file name for an image to prevent collisions in the storage bucket.
+     *
+     * @param originalFilename The original filename of the uploaded file.
+     * @return A unique file name.
+     */
     private String generateUniqueFileName(String originalFilename) {
         return UUID.randomUUID().toString() + "_" + originalFilename;
     }
-
+    /**
+     * Uploads a file to Amazon S3 in the bucket configured for the application.
+     *
+     * @param file The multipart file to be uploaded.
+     * @param fileName The name of the file to be used in S3.
+     * @return The URL of the uploaded file.
+     * @throws IOException if an I/O error occurs during file upload.
+     */
     private String uploadFileToS3(MultipartFile file, String fileName) throws IOException {
         File tempFile = File.createTempFile("temp", null);
         file.transferTo(tempFile);
@@ -70,12 +98,24 @@ public class NoteService {
 
         return "https://" + bucketName + ".s3.amazonaws.com/" + s3Path;
     }
-
+    /**
+     * Retrieves all notes associated with a specific plant ID.
+     *
+     * @param plantId The ID of the plant whose notes are to be retrieved.
+     * @return A list of note response DTOs containing the details of each note.
+     */
     public List<NoteResponseDTO> findAllNotesByPlantId(Long plantId) {
         List<Note> notes = noteRepository.findAllByPlantId(plantId);
         return notes.stream().map(noteMapper::toDTO).collect(Collectors.toList());
     }
-
+    /**
+     * Updates an existing note by its ID. If a new image is provided, the old one is replaced on Amazon S3.
+     *
+     * @param noteId The ID of the note to update.
+     * @param requestDTO The DTO containing the updated note details and optional new image.
+     * @return The response DTO containing details of the updated note.
+     * @throws IOException if an I/O error occurs during file upload.
+     */
     public NoteResponseDTO updateNote(Long noteId, NoteRequestDTO requestDTO) throws IOException {
         Note existingNote = noteRepository.findById(noteId)
                 .orElseThrow(() -> new NoteNotFoundException("Note not found with id: " + noteId));
@@ -103,16 +143,19 @@ public class NoteService {
         return noteMapper.toDTO(updatedNote);
     }
 
-
+    /**
+     * Deletes a file from Amazon S3 based on the URL of the file.
+     * @param fileUrl
+     */
     private void deleteFileFromS3(String fileUrl) {
         String s3Key = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
         s3client.deleteObject(bucketName, s3Key);
     }
 
     /**
-     * Delete note by id
+     * Deletes an existing note and its associated image from Amazon S3 by note ID.
      *
-     * @param noteId
+     * @param noteId The ID of the note to be deleted.
      */
     public void deleteNote(Long noteId) {
         Note note = noteRepository.findById(noteId)

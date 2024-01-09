@@ -20,7 +20,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
+/**
+ * Service layer for managing plant-related data.
+ * This service provides functionality to add, update, delete, and retrieve plant information,
+ * including the handling of plant images via Amazon S3 storage service.
+ *
+ * @author cyboranf
+ * @version 1.0
+ * @since 1.0
+ */
 @Service
 @Transactional
 public class PlantService {
@@ -36,7 +44,13 @@ public class PlantService {
         this.plantMapper = plantMapper;
         this.s3client = s3client;
     }
-
+    /**
+     * Uploads a plant image to Amazon S3 and saves the plant information in the database.
+     *
+     * @param requestDTO The DTO containing the plant details and the image to be uploaded.
+     * @return The response DTO containing details of the saved plant including the image URL.
+     * @throws IOException if an I/O error occurs during file upload.
+     */
     public PlantResponseDTO uploadImages(PlantRequestDTO requestDTO) throws IOException {
         MultipartFile file = requestDTO.getPlantImage();
         if (file.isEmpty()) {
@@ -53,11 +67,24 @@ public class PlantService {
 
         return plantMapper.toDTO(savedPlant);
     }
-
+    /**
+     * Generates a unique file name for the uploaded image.
+     * This method prepends a random UUID to the original file name to ensure uniqueness.
+     *
+     * @param originalFilename The original file name of the uploaded image.
+     * @return The unique file name.
+     */
     private String generateUniqueFileName(String originalFilename) {
         return UUID.randomUUID().toString() + "_" + originalFilename;
     }
 
+    /**
+     * Uploads a file to Amazon S3.
+     * @param file
+     * @param fileName
+     * @return
+     * @throws IOException
+     */
     private String uploadFileToS3(MultipartFile file, String fileName) throws IOException {
         File tempFile = File.createTempFile("temp", null);
         file.transferTo(tempFile);
@@ -71,14 +98,23 @@ public class PlantService {
     }
 
     /**
-     * @return DTO of all plants
+     * Retrieves a list of all plants in the database, converting them to their respective DTOs.
+     *
+     * @return A list of DTOs representing all plants.
      */
     public List<PlantResponseDTO> getPlants() {
         return plantRepository.findAll().stream()
                 .map(plantMapper::toDTO)
                 .collect(Collectors.toList());
     }
-
+    /**
+     * Updates the details of an existing plant by its ID.
+     * If the plant is not found, a PlantNotFoundException is thrown.
+     *
+     * @param plantId The ID of the plant to update.
+     * @param requestDTO The DTO containing the updated plant details.
+     * @return The response DTO containing details of the updated plant.
+     */
     public PlantResponseDTO updatePlant(Long plantId, PlantRequestDTO requestDTO) {
         Plant plant = plantRepository.findById(plantId)
                 .orElseThrow(() -> new PlantNotFoundException("Plant with id " + plantId + " not found"));
@@ -95,14 +131,27 @@ public class PlantService {
         Plant updatedPlant = plantRepository.save(plant);
         return plantMapper.toDTO(updatedPlant);
     }
-
+    /**
+     * Deletes a plant from the database by its ID.
+     * If the plant does not exist, a PlantNotFoundException is thrown.
+     *
+     * @param plantId The ID of the plant to be deleted.
+     */
     public void deletePlant(Long plantId) {
         if (!plantRepository.existsById(plantId)) {
             throw new PlantNotFoundException("Plant with id " + plantId + " not found");
         }
         plantRepository.deleteById(plantId);
     }
-
+    /**
+     * Updates the watering and fertilizing times for an existing plant by its ID.
+     * This method allows partial updates to the plant's care schedule.
+     *
+     * @param plantId The ID of the plant to update.
+     * @param wateringTime The new watering time for the plant.
+     * @param fertilizingTime The new fertilizing time for the plant.
+     * @return The response DTO containing details of the updated plant.
+     */
     public PlantResponseDTO updatePlantTimes(Long plantId, LocalDateTime wateringTime, LocalDateTime fertilizingTime) {
         Plant plant = plantRepository.findById(plantId)
                 .orElseThrow(() -> new PlantNotFoundException("Plant with id " + plantId + " not found"));

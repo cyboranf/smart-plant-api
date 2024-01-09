@@ -9,7 +9,15 @@ import com.example.smartplantbuddy.validation.RegisterValidator;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-
+/**
+ * Service layer for handling user registration.
+ * This service manages the creation of new user accounts based on registration requests.
+ * It involves validating the registration details and persisting the new user to the database.
+ *
+ * @author cyboranf
+ * @version 1.0
+ * @since 1.0
+ */
 @Service
 @Transactional
 public class RegisterService {
@@ -24,8 +32,11 @@ public class RegisterService {
     }
 
     /**
-     * @param requestDTO
-     * @return DTO of new account
+     * Creates a new user account based on the registration request data.
+     * The registration data is validated before the account is created.
+     *
+     * @param requestDTO The DTO containing the registration details.
+     * @return A DTO representing the newly created user account.
      */
     public RegisterResponseDTO createAccount(RegisterRequestDTO requestDTO) {
         registerValidator.registerValidation(requestDTO);

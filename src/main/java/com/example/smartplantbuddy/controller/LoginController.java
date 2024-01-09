@@ -12,6 +12,14 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+/**
+ * REST controller for handling user authentication.
+ * Provides an endpoint for user login, returning a JWT for successful authentication.
+ *
+ * @author cyboranf
+ * @version 1.0
+ * @since 1.0
+ */
 
 @RestController
 @RequestMapping("/api")
@@ -23,7 +31,14 @@ public class LoginController {
         this.authenticationManager = authenticationManager;
         this.tokenProvider = tokenProvider;
     }
-
+    /**
+     * Authenticates a user based on login credentials.
+     * If authentication is successful, a JWT token is generated and returned.
+     *
+     * @param loginRequestDTO The DTO containing the user's login credentials.
+     * @param response The HttpServletResponse used for setting the JWT cookie.
+     * @return The response entity containing the JWT and user login.
+     */
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequestDTO loginRequestDTO, HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.getLogin(), loginRequestDTO.getPassword()));

@@ -1,7 +1,5 @@
 package com.example.smartplantbuddy.controller;
 
-import com.example.smartplantbuddy.dto.note.NoteRequestDTO;
-import com.example.smartplantbuddy.dto.note.NoteResponseDTO;
 import com.example.smartplantbuddy.dto.plant.PlantRequestDTO;
 import com.example.smartplantbuddy.dto.plant.PlantResponseDTO;
 import com.example.smartplantbuddy.exception.plant.ImageEmptyException;
@@ -17,6 +15,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+/**
+ * REST controller for managing plants.
+ * Provides endpoints for uploading, updating, deleting, and retrieving plant information.
+ *
+ * @author cyboranf
+ * @version 1.0
+ * @since 1.0
+ */
 @RestController
 @RequestMapping("/api/plant")
 public class PlantController {
@@ -27,6 +33,12 @@ public class PlantController {
         this.noteService = noteService;
     }
 
+    /**
+     * Uploads a new plant along with its image.
+     *
+     * @param requestDTO The DTO containing the plant details and the image to be uploaded.
+     * @return A ResponseEntity containing the created PlantResponseDTO or an error message.
+     */
     @PostMapping("/upload")
     public ResponseEntity<?> uploadPlant(@ModelAttribute PlantRequestDTO requestDTO) {
         try {
@@ -39,12 +51,24 @@ public class PlantController {
         }
     }
 
+    /**
+     * Retrieves a list of all plants.
+     *
+     * @return A ResponseEntity containing a list of PlantResponseDTOs.
+     */
     @GetMapping("/all")
     public ResponseEntity<List<PlantResponseDTO>> showAll() {
         List<PlantResponseDTO> plants = plantService.getPlants();
         return ResponseEntity.ok(plants);
     }
 
+    /**
+     * Updates an existing plant by its ID.
+     *
+     * @param plantId The ID of the plant to update.
+     * @param requestDTO The DTO containing the updated plant details.
+     * @return A ResponseEntity containing the updated PlantResponseDTO or an error message.
+     */
     @PutMapping("/update/{plantId}")
     public ResponseEntity<?> updatePlant(@PathVariable Long plantId, @ModelAttribute PlantRequestDTO requestDTO) {
         try {
@@ -57,6 +81,12 @@ public class PlantController {
         }
     }
 
+    /**
+     * Deletes a plant by its ID.
+     *
+     * @param plantId The ID of the plant to delete.
+     * @return A ResponseEntity indicating the result of the operation.
+     */
     @DeleteMapping("/delete/{plantId}")
     public ResponseEntity<?> deletePlant(@PathVariable Long plantId) {
         try {
@@ -69,6 +99,14 @@ public class PlantController {
         }
     }
 
+    /**
+     * Updates the watering and fertilizing times for an existing plant by its ID.
+     *
+     * @param plantId The ID of the plant to update.
+     * @param wateringTime The new watering time for the plant.
+     * @param fertilizingTime The new fertilizing time for the plant.
+     * @return A ResponseEntity containing the updated PlantResponseDTO or an error message.
+     */
     @PatchMapping("/update-times/{plantId}")
     public ResponseEntity<?> updatePlantTimes(@PathVariable Long plantId,
                                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime wateringTime,
