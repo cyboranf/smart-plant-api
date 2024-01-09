@@ -35,6 +35,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/swagger-ui/**", "/swagger-resources/**", "/v2/api-docs", "/v3/api-docs/**", "/webjars/**")
                 .permitAll()
+
                 .antMatchers(HttpMethod.POST, "/api/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/signup").permitAll()
 
@@ -43,6 +44,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
                 .antMatchers(HttpMethod.POST, "/api/gallery/add").hasAuthority("USER")
                 .antMatchers(HttpMethod.DELETE, "/api/gallery/delete/{galleryId}").hasAuthority("USER")
+                .antMatchers(HttpMethod.GET, "/api/gallery/plant/{plantId}").hasAuthority("USER")
 
                 .antMatchers(HttpMethod.POST, "/api/plant/upload").hasAuthority("USER")
                 .antMatchers(HttpMethod.GET, "/api/plant/all").hasAuthority("USER")

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/gallery")
@@ -33,5 +34,10 @@ public class GalleryController {
     public ResponseEntity<?> deleteImage(@PathVariable Long galleryId) {
         galleryService.deleteImage(galleryId);
         return ResponseEntity.ok().build();
+    }
+    @GetMapping("/plant/{plantId}")
+    public ResponseEntity<List<GalleryResponseDTO>> getGalleriesByPlantId(@PathVariable Long plantId) {
+        List<GalleryResponseDTO> galleries = galleryService.getGalleriesByPlantId(plantId);
+        return ResponseEntity.ok(galleries);
     }
 }
