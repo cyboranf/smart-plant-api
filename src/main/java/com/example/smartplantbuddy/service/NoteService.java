@@ -68,4 +68,5 @@ public class NoteService {
         List<Note> notes = noteRepository.findAllByPlantId(plantId);
         return notes.stream().map(noteMapper::toDTO).collect(Collectors.toList());
     }
+    // TODO: Dorobić CRUDA a konkretnie update i delete
 }

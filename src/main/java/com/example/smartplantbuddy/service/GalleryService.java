@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.example.smartplantbuddy.dto.gallery.GalleryRequestDTO;
 import com.example.smartplantbuddy.dto.gallery.GalleryResponseDTO;
+import com.example.smartplantbuddy.exception.gallery.ImageNotFoundException;
 import com.example.smartplantbuddy.exception.plant.ImageEmptyException;
 import com.example.smartplantbuddy.mapper.GalleryMapper;
 import com.example.smartplantbuddy.model.Gallery;
@@ -65,5 +66,17 @@ public class GalleryService {
         tempFile.deleteOnExit();
 
         return "https://" + bucketName + ".s3.amazonaws.com/" + s3Path;
+    }
+    public void deleteImage(Long galleryId) {
+        Gallery gallery = galleryRepository.findById(galleryId)
+                .orElseThrow(() -> new ImageNotFoundException("Gallery entry not found."));
+
+        deleteFileFromS3(gallery.getImageUrl());
+        galleryRepository.deleteById(galleryId);
+    }
+
+    private void deleteFileFromS3(String fileUrl) {
+        String s3Key = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
+        s3client.deleteObject(bucketName, s3Key);
     }
 }

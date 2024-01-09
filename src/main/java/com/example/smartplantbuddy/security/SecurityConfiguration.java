@@ -36,19 +36,20 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/swagger-ui/**", "/swagger-resources/**", "/v2/api-docs", "/v3/api-docs/**", "/webjars/**")
                 .permitAll()
                 .antMatchers(HttpMethod.POST, "/api/login").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/signup").permitAll()
 
                 .antMatchers("/api/user/isUser").hasAuthority("USER")
                 .antMatchers("/error").permitAll()
 
                 .antMatchers(HttpMethod.POST, "/api/gallery/add").hasAuthority("USER")
+                .antMatchers(HttpMethod.DELETE, "/api/gallery/delete/{galleryId}").hasAuthority("USER")
 
-                .antMatchers(HttpMethod.POST, "/api/signup").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/plant/upload").permitAll() // authentication to change
-                .antMatchers(HttpMethod.GET, "/api/plant/all").permitAll() // authentication to change
-                .antMatchers(HttpMethod.POST, "/api/plant/addNote").permitAll() // authentication to change
-                .antMatchers(HttpMethod.GET, "/api/plant/{plantId}/notes").permitAll() // authentication to change
-                .antMatchers(HttpMethod.DELETE, "/api/plant/delete/{plantId}").permitAll() // authentication to change
-                .antMatchers(HttpMethod.PUT, "/api/plant/update/{plantId}").permitAll() // authentication to change
+                .antMatchers(HttpMethod.POST, "/api/plant/upload").hasAuthority("USER")
+                .antMatchers(HttpMethod.GET, "/api/plant/all").hasAuthority("USER")
+                .antMatchers(HttpMethod.POST, "/api/plant/addNote").hasAuthority("USER")
+                .antMatchers(HttpMethod.GET, "/api/plant/{plantId}/notes").hasAuthority("USER")
+                .antMatchers(HttpMethod.DELETE, "/api/plant/delete/{plantId}").hasAuthority("USER")
+                .antMatchers(HttpMethod.PUT, "/api/plant/update/{plantId}").hasAuthority("USER")
 
                 .anyRequest().authenticated()
                 .and()

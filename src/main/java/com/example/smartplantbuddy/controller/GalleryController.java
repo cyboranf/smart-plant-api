@@ -29,4 +29,9 @@ public class GalleryController {
         GalleryResponseDTO response = galleryService.addImageToPlant(galleryRequestDTO);
         return ResponseEntity.ok(response);
     }
+    @DeleteMapping("/delete/{galleryId}")
+    public ResponseEntity<?> deleteImage(@PathVariable Long galleryId) {
+        galleryService.deleteImage(galleryId);
+        return ResponseEntity.ok().build();
+    }
 }
