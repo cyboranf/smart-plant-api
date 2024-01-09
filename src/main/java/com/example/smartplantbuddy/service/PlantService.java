@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -100,5 +101,16 @@ public class PlantService {
             throw new PlantNotFoundException("Plant with id " + plantId + " not found");
         }
         plantRepository.deleteById(plantId);
+    }
+
+    public PlantResponseDTO updatePlantTimes(Long plantId, LocalDateTime wateringTime, LocalDateTime fertilizingTime) {
+        Plant plant = plantRepository.findById(plantId)
+                .orElseThrow(() -> new PlantNotFoundException("Plant with id " + plantId + " not found"));
+
+        plant.setWateringTime(wateringTime);
+        plant.setFertilizingTime(fertilizingTime);
+
+        Plant updatedPlant = plantRepository.save(plant);
+        return plantMapper.toDTO(updatedPlant);
     }
 }

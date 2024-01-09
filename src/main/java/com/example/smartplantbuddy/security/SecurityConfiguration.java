@@ -48,9 +48,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
                 .antMatchers(HttpMethod.POST, "/api/plant/upload").hasAuthority("USER")
                 .antMatchers(HttpMethod.GET, "/api/plant/all").hasAuthority("USER")
-
                 .antMatchers(HttpMethod.DELETE, "/api/plant/delete/{plantId}").hasAuthority("USER")
                 .antMatchers(HttpMethod.PUT, "/api/plant/update/{plantId}").hasAuthority("USER")
+                .antMatchers(HttpMethod.PATCH, "/api/plant/update-times/{plantId}").hasAuthority("USER")
 
                 .antMatchers(HttpMethod.POST, "/api/note/addNote").hasAuthority("USER")
                 .antMatchers(HttpMethod.GET, "/api/note/{plantId}/notes").hasAuthority("USER")
