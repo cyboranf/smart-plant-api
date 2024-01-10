@@ -8,6 +8,7 @@ import com.example.smartplantbuddy.model.Comment;
 import com.example.smartplantbuddy.model.User;
 import com.example.smartplantbuddy.repository.CommentRepository;
 import com.example.smartplantbuddy.repository.UserRepository;
+import com.example.smartplantbuddy.validation.CommentValidator;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -19,11 +20,13 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class CommentService {
+    private final CommentValidator commentValidator;
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
     private final UserRepository userRepository;
 
-    public CommentService(CommentRepository commentRepository, CommentMapper commentMapper, UserRepository userRepository) {
+    public CommentService(CommentValidator commentValidator, CommentRepository commentRepository, CommentMapper commentMapper, UserRepository userRepository) {
+        this.commentValidator = commentValidator;
         this.commentRepository = commentRepository;
         this.commentMapper = commentMapper;
         this.userRepository = userRepository;
@@ -36,6 +39,7 @@ public class CommentService {
      * @return The response DTO of the created comment.
      */
     public CommentResponseDTO addCommentToPlant(CommentRequestDTO commentRequestDTO) {
+        commentValidator.commentRequestDTOValidation(commentRequestDTO);
         Comment comment = commentMapper.toEntity(commentRequestDTO);
         comment.setUser(getAuthenticatedUser());
         Comment savedComment = commentRepository.save(comment);
@@ -49,6 +53,7 @@ public class CommentService {
      * @return A list of comment response DTOs.
      */
     public List<CommentResponseDTO> getCommentsByPlantId(Long plantId) {
+        commentValidator.getCommentsByPlantIdValidation(plantId);
         List<Comment> comments = commentRepository.findByPlantId(plantId);
         return comments.stream().map(commentMapper::toDTO).collect(Collectors.toList());
     }
@@ -63,6 +68,7 @@ public class CommentService {
     public CommentResponseDTO updateComment(Long commentId, CommentRequestDTO commentRequestDTO) {
         Comment existingComment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException("Comment not found with id: " + commentId));
+        commentValidator.commentRequestDTOValidation(commentRequestDTO);
         existingComment.setContent(commentRequestDTO.getContent());
         Comment updatedComment = commentRepository.save(existingComment);
         return commentMapper.toDTO(updatedComment);

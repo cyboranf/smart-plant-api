@@ -12,6 +12,7 @@ import com.example.smartplantbuddy.model.Note;
 import com.example.smartplantbuddy.model.Plant;
 import com.example.smartplantbuddy.repository.NoteRepository;
 import com.example.smartplantbuddy.repository.PlantRepository;
+import com.example.smartplantbuddy.validation.NoteValidator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class NoteService {
     private final NoteRepository noteRepository;
+    private final NoteValidator noteValidator;
     private final NoteMapper noteMapper;
     private final PlantRepository plantRepository;
     private final AmazonS3 s3client;
@@ -44,12 +46,14 @@ public class NoteService {
     @Value("${cloud.aws.bucket.name}")
     private String bucketName;
 
-    public NoteService(NoteRepository noteRepository, NoteMapper noteMapper, PlantRepository plantRepository, AmazonS3 s3client) {
+    public NoteService(NoteRepository noteRepository, NoteValidator noteValidator, NoteMapper noteMapper, PlantRepository plantRepository, AmazonS3 s3client) {
         this.noteRepository = noteRepository;
+        this.noteValidator = noteValidator;
         this.noteMapper = noteMapper;
         this.plantRepository = plantRepository;
         this.s3client = s3client;
     }
+
     /**
      * Creates a new note associated with a plant and optionally uploads an image to Amazon S3.
      *
@@ -58,6 +62,7 @@ public class NoteService {
      * @throws IOException if an I/O error occurs during file upload.
      */
     public NoteResponseDTO addNoteToPlant(NoteRequestDTO requestDTO) throws IOException {
+        noteValidator.noteRequestDTOValidation(requestDTO);
         MultipartFile file = requestDTO.getPlantImage();
         Note note = noteMapper.toEntity(requestDTO);
 
@@ -70,6 +75,7 @@ public class NoteService {
         Note savedNote = noteRepository.save(note);
         return noteMapper.toDTO(savedNote);
     }
+
     /**
      * Generates a unique file name for an image to prevent collisions in the storage bucket.
      *
@@ -79,10 +85,11 @@ public class NoteService {
     private String generateUniqueFileName(String originalFilename) {
         return UUID.randomUUID().toString() + "_" + originalFilename;
     }
+
     /**
      * Uploads a file to Amazon S3 in the bucket configured for the application.
      *
-     * @param file The multipart file to be uploaded.
+     * @param file     The multipart file to be uploaded.
      * @param fileName The name of the file to be used in S3.
      * @return The URL of the uploaded file.
      * @throws IOException if an I/O error occurs during file upload.
@@ -98,6 +105,7 @@ public class NoteService {
 
         return "https://" + bucketName + ".s3.amazonaws.com/" + s3Path;
     }
+
     /**
      * Retrieves all notes associated with a specific plant ID.
      *
@@ -105,20 +113,21 @@ public class NoteService {
      * @return A list of note response DTOs containing the details of each note.
      */
     public List<NoteResponseDTO> findAllNotesByPlantId(Long plantId) {
+        noteValidator.plantToAddNoteValidation(plantId);
         List<Note> notes = noteRepository.findAllByPlantId(plantId);
         return notes.stream().map(noteMapper::toDTO).collect(Collectors.toList());
     }
+
     /**
      * Updates an existing note by its ID. If a new image is provided, the old one is replaced on Amazon S3.
      *
-     * @param noteId The ID of the note to update.
+     * @param noteId     The ID of the note to update.
      * @param requestDTO The DTO containing the updated note details and optional new image.
      * @return The response DTO containing details of the updated note.
      * @throws IOException if an I/O error occurs during file upload.
      */
     public NoteResponseDTO updateNote(Long noteId, NoteRequestDTO requestDTO) throws IOException {
-        Note existingNote = noteRepository.findById(noteId)
-                .orElseThrow(() -> new NoteNotFoundException("Note not found with id: " + noteId));
+        Note existingNote = noteValidator.noteUpdateValidation(noteId, requestDTO);
 
         // Check if a new image is provided
         MultipartFile file = requestDTO.getPlantImage();
@@ -145,6 +154,7 @@ public class NoteService {
 
     /**
      * Deletes a file from Amazon S3 based on the URL of the file.
+     *
      * @param fileUrl
      */
     private void deleteFileFromS3(String fileUrl) {
@@ -158,8 +168,7 @@ public class NoteService {
      * @param noteId The ID of the note to be deleted.
      */
     public void deleteNote(Long noteId) {
-        Note note = noteRepository.findById(noteId)
-                .orElseThrow(() -> new NoteNotFoundException("Note not found with id: " + noteId));
+        Note note = noteValidator.removingNoteValidation(noteId);
         if (note.getImageUrl() != null) {
             deleteFileFromS3(note.getImageUrl());
         }

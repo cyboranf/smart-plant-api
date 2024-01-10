@@ -9,6 +9,7 @@ import com.example.smartplantbuddy.exception.plant.PlantNotFoundException;
 import com.example.smartplantbuddy.mapper.PlantMapper;
 import com.example.smartplantbuddy.model.Plant;
 import com.example.smartplantbuddy.repository.PlantRepository;
+import com.example.smartplantbuddy.validation.PlantValidator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 /**
  * Service layer for managing plant-related data.
  * This service provides functionality to add, update, delete, and retrieve plant information,
@@ -32,6 +34,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class PlantService {
+    private final PlantValidator plantValidator;
     private final PlantRepository plantRepository;
     private final PlantMapper plantMapper;
     private final AmazonS3 s3client;
@@ -39,11 +42,13 @@ public class PlantService {
     @Value("${cloud.aws.bucket.name}")
     private String bucketName;
 
-    public PlantService(PlantRepository plantRepository, PlantMapper plantMapper, AmazonS3 s3client) {
+    public PlantService(PlantValidator plantValidator, PlantRepository plantRepository, PlantMapper plantMapper, AmazonS3 s3client) {
+        this.plantValidator = plantValidator;
         this.plantRepository = plantRepository;
         this.plantMapper = plantMapper;
         this.s3client = s3client;
     }
+
     /**
      * Uploads a plant image to Amazon S3 and saves the plant information in the database.
      *
@@ -52,6 +57,7 @@ public class PlantService {
      * @throws IOException if an I/O error occurs during file upload.
      */
     public PlantResponseDTO uploadImages(PlantRequestDTO requestDTO) throws IOException {
+        plantValidator.validatePlant(requestDTO);
         MultipartFile file = requestDTO.getPlantImage();
         if (file.isEmpty()) {
             throw new ImageEmptyException("You didn't send an image which You want to upload.");
@@ -67,6 +73,7 @@ public class PlantService {
 
         return plantMapper.toDTO(savedPlant);
     }
+
     /**
      * Generates a unique file name for the uploaded image.
      * This method prepends a random UUID to the original file name to ensure uniqueness.
@@ -80,6 +87,7 @@ public class PlantService {
 
     /**
      * Uploads a file to Amazon S3.
+     *
      * @param file
      * @param fileName
      * @return
@@ -107,17 +115,17 @@ public class PlantService {
                 .map(plantMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
     /**
      * Updates the details of an existing plant by its ID.
      * If the plant is not found, a PlantNotFoundException is thrown.
      *
-     * @param plantId The ID of the plant to update.
+     * @param plantId    The ID of the plant to update.
      * @param requestDTO The DTO containing the updated plant details.
      * @return The response DTO containing details of the updated plant.
      */
     public PlantResponseDTO updatePlant(Long plantId, PlantRequestDTO requestDTO) {
-        Plant plant = plantRepository.findById(plantId)
-                .orElseThrow(() -> new PlantNotFoundException("Plant with id " + plantId + " not found"));
+        Plant plant = plantValidator.validateUpdatingPlant(plantId, requestDTO);
 
         plant.setName(requestDTO.getName());
         plant.setDescription(requestDTO.getDescription());
@@ -131,6 +139,7 @@ public class PlantService {
         Plant updatedPlant = plantRepository.save(plant);
         return plantMapper.toDTO(updatedPlant);
     }
+
     /**
      * Deletes a plant from the database by its ID.
      * If the plant does not exist, a PlantNotFoundException is thrown.
@@ -143,12 +152,13 @@ public class PlantService {
         }
         plantRepository.deleteById(plantId);
     }
+
     /**
      * Updates the watering and fertilizing times for an existing plant by its ID.
      * This method allows partial updates to the plant's care schedule.
      *
-     * @param plantId The ID of the plant to update.
-     * @param wateringTime The new watering time for the plant.
+     * @param plantId         The ID of the plant to update.
+     * @param wateringTime    The new watering time for the plant.
      * @param fertilizingTime The new fertilizing time for the plant.
      * @return The response DTO containing details of the updated plant.
      */
