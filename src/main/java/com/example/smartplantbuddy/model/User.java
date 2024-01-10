@@ -62,4 +62,16 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "plant_id")
     )
     private Set<Plant> plants;
+
+    /**
+     * The set of users who are friends with this user.
+     * This represents a many-to-many relationship where users can have multiple friends.
+     */
+    @ManyToMany
+    @JoinTable(
+            name = "user_friends",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_id")
+    )
+    private Set<User> friends;
 }

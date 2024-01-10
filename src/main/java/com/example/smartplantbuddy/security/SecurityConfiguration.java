@@ -57,6 +57,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.PUT, "/api/note/{noteId}").hasAuthority("USER")
                 .antMatchers(HttpMethod.DELETE, "/api/note/{noteId}").hasAuthority("USER")
 
+                .antMatchers(HttpMethod.POST, "/api/comment/add").hasAuthority("USER")
+                .antMatchers(HttpMethod.GET, "/api/comment/plant/{plantId}").hasAuthority("USER")
+                .antMatchers(HttpMethod.PUT, "/api/comment/update/{commentId}").hasAuthority("USER")
+                .antMatchers(HttpMethod.DELETE, "/api/comment/delete/{commentId}").hasAuthority("USER")
+
                 .anyRequest().authenticated()
                 .and()
                 .apply(new JwtConfigurer(jwtTokenProvider));
