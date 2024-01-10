@@ -2,17 +2,17 @@ package com.example.smartplantbuddy.controller;
 
 import com.example.smartplantbuddy.dto.user.UserResponseDTO;
 import com.example.smartplantbuddy.exception.user.UsernameNotFoundException;
+import com.example.smartplantbuddy.model.Invitation;
 import com.example.smartplantbuddy.model.Plant;
 import com.example.smartplantbuddy.model.Role;
 import com.example.smartplantbuddy.model.User;
 import com.example.smartplantbuddy.repository.UserRepository;
 import com.example.smartplantbuddy.security.JwtTokenProvider;
+import com.example.smartplantbuddy.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.stream.Collectors;
 
@@ -28,13 +28,16 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/user")
 public class UserController {
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserService userService;
     private final UserRepository userRepository;
 
-    public UserController(JwtTokenProvider jwtTokenProvider, UserRepository userRepository) {
+    public UserController(JwtTokenProvider jwtTokenProvider, UserService userService, UserRepository userRepository) {
         this.jwtTokenProvider = jwtTokenProvider;
+        this.userService = userService;
         this.userRepository = userRepository;
     }
-
+    // TODO: Invitation feature must be tested and checked.
+    // TODO: Code in Plant Controller showing plants of other friends, code endpoint to see suggests friends
     /**
      * Checks if the current authenticated user exists in the system.
      *
@@ -47,6 +50,47 @@ public class UserController {
                 .orElseThrow(() -> new UsernameNotFoundException("User with given username not found"));
         return ResponseEntity.ok(mapToUserResponseDTO(user));
     }
+
+    /**
+     * Sends a friend invitation to another user.
+     *
+     * @param inviteeId The ID of the user to whom the invitation is sent.
+     * @return A ResponseEntity with the details of the sent invitation.
+     */
+    @PostMapping("/send-invitation")
+    public ResponseEntity<Invitation> sendInvitation(@RequestParam Long inviteeId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        Long inviterId = userService.findByLogin(username);
+
+        Invitation invitation = userService.sendInvitation(inviterId, inviteeId);
+        return ResponseEntity.ok(invitation);
+    }
+
+    /**
+     * Accepts a received friend invitation.
+     *
+     * @param invitationId The ID of the invitation to accept.
+     * @return A ResponseEntity indicating the acceptance of the invitation.
+     */
+    @PutMapping("/accept-invitation/{invitationId}")
+    public ResponseEntity<?> acceptInvitation(@PathVariable Long invitationId) {
+        userService.acceptInvitation(invitationId);
+        return ResponseEntity.ok("Invitation accepted.");
+    }
+
+    /**
+     * Declines a received friend invitation.
+     *
+     * @param invitationId The ID of the invitation to decline.
+     * @return A ResponseEntity indicating the decline of the invitation.
+     */
+    @PutMapping("/decline-invitation/{invitationId}")
+    public ResponseEntity<?> declineInvitation(@PathVariable Long invitationId) {
+        userService.declineInvitation(invitationId);
+        return ResponseEntity.ok("Invitation declined.");
+    }
+
     /**
      * Maps a User entity to a UserResponseDTO.
      *

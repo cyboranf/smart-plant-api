@@ -74,4 +74,20 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "friend_id")
     )
     private Set<User> friends;
+
+    /**
+     * The set of invitations received by the user.
+     * This field represents all the friend invitations that this user has received from other users.
+     * It is mapped as a one-to-many relationship where one user can receive many invitations.
+     */
+    @OneToMany(mappedBy = "invitee")
+    private Set<Invitation> receivedInvitations;
+
+    /**
+     * The set of invitations sent by the user.
+     * This field represents all the friend invitations that this user has sent to other users.
+     * It is mapped as a one-to-many relationship where one user can send many invitations.
+     */
+    @OneToMany(mappedBy = "inviter")
+    private Set<Invitation> sentInvitations;
 }

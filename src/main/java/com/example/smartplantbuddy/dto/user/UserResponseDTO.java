@@ -10,4 +10,7 @@ public class UserResponseDTO {
     private String login;
     private Set<String> roles;
     private Set<Long> plantIds;
+    private Set<Long> receivedInvitationIds;
+    private Set<Long> sentInvitationIds;
+
 }
