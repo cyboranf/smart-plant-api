@@ -126,6 +126,19 @@ public class PlantController {
         }
     }
 
+    @PatchMapping("/{plantId}/update-light")
+    public ResponseEntity<?> updatePlantTimes(@PathVariable Long plantId,
+                                              @RequestParam int lightScore) {
+        try {
+            PlantResponseDTO updatedPlant = plantService.updatePlantLightScore(plantId, lightScore);
+            return new ResponseEntity<>(updatedPlant, HttpStatus.OK);
+        } catch (PlantNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("An error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/friends-plants/{userId}")
     public ResponseEntity<?> getFriendsPlants(@PathVariable Long userId) {
         try {

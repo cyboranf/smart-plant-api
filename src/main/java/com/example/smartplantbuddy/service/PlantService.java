@@ -188,6 +188,16 @@ public class PlantService {
         return plantMapper.toDTO(updatedPlant);
     }
 
+    public PlantResponseDTO updatePlantLightScore(Long plantId, int lightScore) {
+        Plant plant = plantRepository.findById(plantId)
+                .orElseThrow(() -> new PlantNotFoundException("Plant with id " + plantId + " not found"));
+
+        plant.setLightScore(lightScore);
+
+        Plant updatedPlant = plantRepository.save(plant);
+        return plantMapper.toDTO(updatedPlant);
+    }
+
     /**
      * Retrieves a list of plants associated with a user by their ID.
      * If the user does not exist, a UserNotFoundException is thrown.
