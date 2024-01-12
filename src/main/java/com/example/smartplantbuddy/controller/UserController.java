@@ -10,11 +10,13 @@ import com.example.smartplantbuddy.model.User;
 import com.example.smartplantbuddy.repository.UserRepository;
 import com.example.smartplantbuddy.security.JwtTokenProvider;
 import com.example.smartplantbuddy.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -90,6 +92,30 @@ public class UserController {
         userService.declineInvitation(invitationId);
         return ResponseEntity.ok("Invitation declined.");
     }
+
+    @GetMapping("/friends/{userId}")
+    public ResponseEntity<?> getUserFriends(@PathVariable Long userId) {
+        try {
+            List<UserResponseDTO> friends = userService.getUserFriends(userId);
+            return ResponseEntity.ok(friends);
+        } catch (UsernameNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("An error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @GetMapping("/invitations/{userId}")
+    public ResponseEntity<?> getUserInvitations(@PathVariable Long userId) {
+        try {
+            List<InvitationResponseDTO> invitations = userService.getUserInvitations(userId);
+            return ResponseEntity.ok(invitations);
+        } catch (UsernameNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("An error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     /**
      * Maps a User entity to a UserResponseDTO.

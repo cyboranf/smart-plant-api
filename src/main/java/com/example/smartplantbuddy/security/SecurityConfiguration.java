@@ -39,7 +39,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/api/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/signup").permitAll()
 
-                //TODO: Check if these endpoints are correct
+                .antMatchers(HttpMethod.GET, "/api/user/friends/{userId}").hasAuthority("USER")
+                .antMatchers(HttpMethod.GET, "/api/user/invitations/{userId}").hasAuthority("USER")
                 .antMatchers("/api/user/isUser").hasAuthority("USER")
                 .antMatchers("/api/user/send-invitation").hasAuthority("USER")
                 .antMatchers("/api/user/accept-invitation/{invitationId}").hasAuthority("USER")
