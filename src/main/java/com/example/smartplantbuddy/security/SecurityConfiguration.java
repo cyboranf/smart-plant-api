@@ -33,7 +33,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/swagger-ui/**", "/swagger-resources/**", "/v2/api-docs", "/v3/api-docs/**", "/webjars/**","/swagger-ui.html")
+                .antMatchers("/swagger-ui/**", "/swagger-resources/**", "/v2/api-docs", "/v3/api-docs/**", "/webjars/**", "/swagger-ui.html")
                 .permitAll()
 
                 .antMatchers(HttpMethod.POST, "/api/login").permitAll()
@@ -50,6 +50,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.DELETE, "/api/gallery/delete/{galleryId}").hasAuthority("USER")
                 .antMatchers(HttpMethod.GET, "/api/gallery/plant/{plantId}").hasAuthority("USER")
 
+                .antMatchers(HttpMethod.GET, "/api/plant/friends-plants/{userId}").hasAuthority("USER")
+                .antMatchers(HttpMethod.GET, "/api/plant/friends-plants-details/{userId}").hasAuthority("USER")
                 .antMatchers(HttpMethod.POST, "/api/plant/upload").hasAuthority("USER")
                 .antMatchers(HttpMethod.GET, "/api/plant/all").hasAuthority("USER")
                 .antMatchers(HttpMethod.DELETE, "/api/plant/delete/{plantId}").hasAuthority("USER")
@@ -65,7 +67,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/comment/plant/{plantId}").hasAuthority("USER")
                 .antMatchers(HttpMethod.PUT, "/api/comment/update/{commentId}").hasAuthority("USER")
                 .antMatchers(HttpMethod.DELETE, "/api/comment/delete/{commentId}").hasAuthority("USER")
-
 
 
                 .anyRequest().authenticated()

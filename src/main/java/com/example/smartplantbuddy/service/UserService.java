@@ -81,4 +81,6 @@ public class UserService {
     public Long findByLogin(String login) {
         return userRepository.findByLogin(login).orElseThrow(() -> new UsernameNotFoundException("User not found")).getId();
     }
+
+    //TODO: Invitation list, User Friends list
 }

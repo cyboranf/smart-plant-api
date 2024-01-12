@@ -103,4 +103,7 @@ public class Plant {
      */
     @OneToMany(mappedBy = "plant", cascade = CascadeType.ALL)
     private List<Gallery> galleries;
+
+    @OneToMany(mappedBy = "plant", cascade = CascadeType.ALL)
+    private List<Comment> comments;
 }

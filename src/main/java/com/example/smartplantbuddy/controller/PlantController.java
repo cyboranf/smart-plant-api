@@ -1,5 +1,7 @@
 package com.example.smartplantbuddy.controller;
 
+import com.example.smartplantbuddy.dto.comment.CommentResponseDTO;
+import com.example.smartplantbuddy.dto.note.NoteResponseDTO;
 import com.example.smartplantbuddy.dto.plant.PlantRequestDTO;
 import com.example.smartplantbuddy.dto.plant.PlantResponseDTO;
 import com.example.smartplantbuddy.exception.plant.ImageEmptyException;
@@ -12,7 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
@@ -28,6 +32,7 @@ import java.util.NoSuchElementException;
 public class PlantController {
     private final PlantService plantService;
     private final NoteService noteService;
+
     public PlantController(PlantService plantService, NoteService noteService) {
         this.plantService = plantService;
         this.noteService = noteService;
@@ -65,7 +70,7 @@ public class PlantController {
     /**
      * Updates an existing plant by its ID.
      *
-     * @param plantId The ID of the plant to update.
+     * @param plantId    The ID of the plant to update.
      * @param requestDTO The DTO containing the updated plant details.
      * @return A ResponseEntity containing the updated PlantResponseDTO or an error message.
      */
@@ -102,8 +107,8 @@ public class PlantController {
     /**
      * Updates the watering and fertilizing times for an existing plant by its ID.
      *
-     * @param plantId The ID of the plant to update.
-     * @param wateringTime The new watering time for the plant.
+     * @param plantId         The ID of the plant to update.
+     * @param wateringTime    The new watering time for the plant.
      * @param fertilizingTime The new fertilizing time for the plant.
      * @return A ResponseEntity containing the updated PlantResponseDTO or an error message.
      */
@@ -121,4 +126,27 @@ public class PlantController {
         }
     }
 
+    @GetMapping("/friends-plants/{userId}")
+    public ResponseEntity<?> getFriendsPlants(@PathVariable Long userId) {
+        try {
+            List<PlantResponseDTO> plants = plantService.getFriendsPlants(userId);
+            return new ResponseEntity<>(plants, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("An error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/friends-plants-details/{userId}")
+    public ResponseEntity<?> getFriendsPlantsNotes(@PathVariable Long userId) {
+        try {
+            List<NoteResponseDTO> notes = plantService.getFriendsPlantsNotes(userId);
+            List<CommentResponseDTO> comments = plantService.getFriendsPlantsComments(userId);
+            Map<String, Object> response = new HashMap<>();
+            response.put("notes", notes);
+            response.put("comments", comments);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("An error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
