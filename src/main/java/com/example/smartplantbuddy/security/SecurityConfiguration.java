@@ -39,7 +39,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/api/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/signup").permitAll()
 
+
                 .antMatchers("/api/user/isUser").hasAuthority("USER")
+                .antMatchers("/api/user/send-invitation").hasAuthority("USER")
+                .antMatchers("/api/user/accept-invitation/{invitationId}").hasAuthority("USER")
+                .antMatchers("/api/user/decline-invitation/{invitationId}").hasAuthority("USER")
                 .antMatchers("/error").permitAll()
 
                 .antMatchers(HttpMethod.POST, "/api/gallery/add").hasAuthority("USER")
@@ -61,6 +65,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/comment/plant/{plantId}").hasAuthority("USER")
                 .antMatchers(HttpMethod.PUT, "/api/comment/update/{commentId}").hasAuthority("USER")
                 .antMatchers(HttpMethod.DELETE, "/api/comment/delete/{commentId}").hasAuthority("USER")
+
+
 
                 .anyRequest().authenticated()
                 .and()
