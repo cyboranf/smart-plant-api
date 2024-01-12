@@ -1,6 +1,11 @@
 package com.example.smartplantbuddy.service;
 
+import com.example.smartplantbuddy.dto.invitation.InvitationResponseDTO;
+import com.example.smartplantbuddy.exception.invitation.InvitationNotFoundException;
+import com.example.smartplantbuddy.exception.invitation.InviteeNotFoundException;
+import com.example.smartplantbuddy.exception.invitation.InviterNotFoundException;
 import com.example.smartplantbuddy.exception.user.UsernameNotFoundException;
+import com.example.smartplantbuddy.mapper.InvitationMapper;
 import com.example.smartplantbuddy.model.Invitation;
 import com.example.smartplantbuddy.model.User;
 import com.example.smartplantbuddy.repository.InvitationRepository;
@@ -19,15 +24,17 @@ public class UserService {
      */
     private final UserRepository userRepository;
     private final InvitationRepository invitationRepository;
+    private final InvitationMapper invitationMapper;
 
-    public UserService(UserRepository userRepository, InvitationRepository invitationRepository) {
+    public UserService(UserRepository userRepository, InvitationRepository invitationRepository, InvitationMapper invitationMapper) {
         this.userRepository = userRepository;
         this.invitationRepository = invitationRepository;
+        this.invitationMapper = invitationMapper;
     }
 
-    public Invitation sendInvitation(Long inviterId, Long inviteeId) {
-        User inviter = userRepository.findById(inviterId).orElseThrow(() -> new RuntimeException("Inviter not found"));
-        User invitee = userRepository.findById(inviteeId).orElseThrow(() -> new RuntimeException("Invitee not found"));
+    public InvitationResponseDTO sendInvitation(Long inviterId, Long inviteeId) {
+        User inviter = userRepository.findById(inviterId).orElseThrow(() -> new InviterNotFoundException("Inviter not found"));
+        User invitee = userRepository.findById(inviteeId).orElseThrow(() -> new InviteeNotFoundException("Invitee not found"));
 
         Invitation invitation = new Invitation();
         invitation.setInviter(inviter);
@@ -35,33 +42,42 @@ public class UserService {
         invitation.setSentAt(LocalDateTime.now());
         invitation.setAccepted(false);
 
-        return invitationRepository.save(invitation);
+        Invitation savedInvitation = invitationRepository.save(invitation);
+
+        return invitationMapper.toDTO(savedInvitation);
     }
 
     public void acceptInvitation(Long invitationId) {
-        Invitation invitation = invitationRepository.findById(invitationId).orElseThrow(() -> new RuntimeException("Invitation not found"));
-        invitation.setRespondedAt(LocalDateTime.now());
-        invitation.setAccepted(true);
+        Invitation invitation = invitationRepository.findById(invitationId)
+                .orElseThrow(() -> new InvitationNotFoundException("Invitation not found"));
 
-        User inviter = invitation.getInviter();
-        User invitee = invitation.getInvitee();
+        if (!invitation.isAccepted()) {
+            invitation.setRespondedAt(LocalDateTime.now());
+            invitation.setAccepted(true);
 
-        inviter.getFriends().add(invitee);
-        invitee.getFriends().add(inviter);
+            User inviter = invitation.getInviter();
+            User invitee = invitation.getInvitee();
 
-        userRepository.save(inviter);
-        userRepository.save(invitee);
+            inviter.getFriends().add(invitee);
+            invitee.getFriends().add(inviter);
 
-        invitationRepository.save(invitation);
+            userRepository.save(inviter);
+            userRepository.save(invitee);
+
+            invitationRepository.save(invitation);
+        } else {
+            throw new IllegalStateException("Invitation already accepted");
+        }
     }
 
     public void declineInvitation(Long invitationId) {
-        Invitation invitation = invitationRepository.findById(invitationId).orElseThrow(() -> new RuntimeException("Invitation not found"));
+        Invitation invitation = invitationRepository.findById(invitationId).orElseThrow(() -> new InvitationNotFoundException("Invitation not found"));
         invitation.setRespondedAt(LocalDateTime.now());
         invitation.setAccepted(false);
 
         invitationRepository.save(invitation);
     }
+
     public Long findByLogin(String login) {
         return userRepository.findByLogin(login).orElseThrow(() -> new UsernameNotFoundException("User not found")).getId();
     }

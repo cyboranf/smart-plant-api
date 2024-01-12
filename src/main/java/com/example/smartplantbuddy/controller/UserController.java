@@ -1,5 +1,6 @@
 package com.example.smartplantbuddy.controller;
 
+import com.example.smartplantbuddy.dto.invitation.InvitationResponseDTO;
 import com.example.smartplantbuddy.dto.user.UserResponseDTO;
 import com.example.smartplantbuddy.exception.user.UsernameNotFoundException;
 import com.example.smartplantbuddy.model.Invitation;
@@ -58,12 +59,12 @@ public class UserController {
      * @return A ResponseEntity with the details of the sent invitation.
      */
     @PostMapping("/send-invitation")
-    public ResponseEntity<Invitation> sendInvitation(@RequestParam Long inviteeId) {
+    public ResponseEntity<InvitationResponseDTO> sendInvitation(@RequestParam Long inviteeId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
         Long inviterId = userService.findByLogin(username);
 
-        Invitation invitation = userService.sendInvitation(inviterId, inviteeId);
+        InvitationResponseDTO invitation = userService.sendInvitation(inviterId, inviteeId);
         return ResponseEntity.ok(invitation);
     }
 
@@ -78,7 +79,6 @@ public class UserController {
         userService.acceptInvitation(invitationId);
         return ResponseEntity.ok("Invitation accepted.");
     }
-
     /**
      * Declines a received friend invitation.
      *

@@ -1,5 +1,6 @@
 package com.example.smartplantbuddy.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ public class Invitation {
     /**
      * The user who sent the invitation.
      */
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "inviter_id")
     private User inviter;
@@ -29,6 +31,7 @@ public class Invitation {
     /**
      * The user who received the invitation.
      */
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "invitee_id")
     private User invitee;

@@ -1,8 +1,10 @@
 package com.example.smartplantbuddy.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -67,19 +69,21 @@ public class User {
      * The set of users who are friends with this user.
      * This represents a many-to-many relationship where users can have multiple friends.
      */
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "user_friends",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "friend_id")
     )
-    private Set<User> friends;
+    private Set<User> friends = new HashSet<>();
 
     /**
      * The set of invitations received by the user.
      * This field represents all the friend invitations that this user has received from other users.
      * It is mapped as a one-to-many relationship where one user can receive many invitations.
      */
+    @JsonIgnore
     @OneToMany(mappedBy = "invitee")
     private Set<Invitation> receivedInvitations;
 
@@ -88,6 +92,20 @@ public class User {
      * This field represents all the friend invitations that this user has sent to other users.
      * It is mapped as a one-to-many relationship where one user can send many invitations.
      */
+    @JsonIgnore
     @OneToMany(mappedBy = "inviter")
     private Set<Invitation> sentInvitations;
+    @Override
+    public int hashCode() {
+        return 31;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        User other = (User) obj;
+        return id != null && id.equals(other.getId());
+    }
+
 }
