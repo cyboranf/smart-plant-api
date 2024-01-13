@@ -20,4 +20,5 @@ public class PlantRequestDTO {
     private int fertilizingFrequency; // in hours
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime fertilizingTime;
+    private Long userId;
 }

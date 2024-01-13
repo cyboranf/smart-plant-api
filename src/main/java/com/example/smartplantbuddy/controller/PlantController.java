@@ -6,13 +6,18 @@ import com.example.smartplantbuddy.dto.plant.PlantRequestDTO;
 import com.example.smartplantbuddy.dto.plant.PlantResponseDTO;
 import com.example.smartplantbuddy.exception.plant.ImageEmptyException;
 import com.example.smartplantbuddy.exception.plant.PlantNotFoundException;
+import com.example.smartplantbuddy.model.User;
+import com.example.smartplantbuddy.repository.UserRepository;
 import com.example.smartplantbuddy.service.NoteService;
 import com.example.smartplantbuddy.service.PlantService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -32,10 +37,12 @@ import java.util.NoSuchElementException;
 public class PlantController {
     private final PlantService plantService;
     private final NoteService noteService;
+    private final UserRepository userRepository;
 
-    public PlantController(PlantService plantService, NoteService noteService) {
+    public PlantController(PlantService plantService, NoteService noteService, UserRepository userRepository) {
         this.plantService = plantService;
         this.noteService = noteService;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -45,9 +52,14 @@ public class PlantController {
      * @return A ResponseEntity containing the created PlantResponseDTO or an error message.
      */
     @PostMapping("/upload")
-    public ResponseEntity<?> uploadPlant(@ModelAttribute PlantRequestDTO requestDTO) {
+    public ResponseEntity<?> uploadPlant(@ModelAttribute PlantRequestDTO requestDTO, Authentication authentication) {
         try {
+            // Here, obtain the user ID from the authentication object or session
+            Long userId = getUserIdFromAuthentication(authentication);
+            requestDTO.setUserId(userId);
+
             PlantResponseDTO responseDTO = plantService.uploadImages(requestDTO);
+
             return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
         } catch (ImageEmptyException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -56,6 +68,18 @@ public class PlantController {
         }
     }
 
+    private Long getUserIdFromAuthentication(Authentication authentication) {
+        // Implement logic to extract user ID from the authentication object
+        // This depends on your security configuration
+        // Assuming the principal is a UserDetails object
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            return userRepository.findByLogin(userDetails.getUsername())
+                    .map(User::getId)
+                    .orElse(null);
+        }
+        return null; // Return null or throw an exception if the user is not found
+    }
     /**
      * Retrieves a list of all plants.
      *
