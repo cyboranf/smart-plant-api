@@ -21,4 +21,5 @@ public class PlantRequestDTO {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime fertilizingTime;
     private Long userId;
+    private MultipartFile newPlantImage;
 }

@@ -69,9 +69,6 @@ public class PlantController {
     }
 
     private Long getUserIdFromAuthentication(Authentication authentication) {
-        // Implement logic to extract user ID from the authentication object
-        // This depends on your security configuration
-        // Assuming the principal is a UserDetails object
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             return userRepository.findByLogin(userDetails.getUsername())

@@ -6,6 +6,7 @@ import com.example.smartplantbuddy.dto.comment.CommentResponseDTO;
 import com.example.smartplantbuddy.dto.note.NoteResponseDTO;
 import com.example.smartplantbuddy.dto.plant.PlantRequestDTO;
 import com.example.smartplantbuddy.dto.plant.PlantResponseDTO;
+import com.example.smartplantbuddy.exception.gallery.ImageUpdateException;
 import com.example.smartplantbuddy.exception.plant.ImageEmptyException;
 import com.example.smartplantbuddy.exception.plant.PlantNotFoundException;
 import com.example.smartplantbuddy.exception.user.UserNotFoundException;
@@ -142,6 +143,7 @@ public class PlantService {
     public PlantResponseDTO updatePlant(Long plantId, PlantRequestDTO requestDTO) {
         Plant plant = plantValidator.validateUpdatingPlant(plantId, requestDTO);
 
+        // Update existing plant details
         plant.setName(requestDTO.getName());
         plant.setDescription(requestDTO.getDescription());
         plant.setWateringTime(requestDTO.getWateringTime());
@@ -151,9 +153,46 @@ public class PlantService {
         plant.setFertilizingFrequency(requestDTO.getFertilizingFrequency());
         plant.setFertilizingTime(requestDTO.getFertilizingTime());
 
+        // Check if a new image was provided and update it
+        MultipartFile newImage = requestDTO.getNewPlantImage();
+        if (newImage != null && !newImage.isEmpty()) {
+            // Handle image update logic here, similar to the image upload logic
+            String newImageUrl = handleImageUpdate(plant, newImage);
+            plant.setImageUrl(newImageUrl);
+        }
+
         Plant updatedPlant = plantRepository.save(plant);
         return plantMapper.toDTO(updatedPlant);
     }
+
+    private String handleImageUpdate(Plant plant, MultipartFile newImage) {
+        try {
+            // Generate a unique file name for the new image
+            String newFileName = generateUniqueFileName(newImage.getOriginalFilename());
+
+            // Upload the new image to Amazon S3 or your chosen storage
+            String newImageUrl = uploadFileToS3(newImage, newFileName);
+
+            // Delete the old image if necessary (optional)
+            String oldImageUrl = plant.getImageUrl();
+            if (oldImageUrl != null && !oldImageUrl.isEmpty()) {
+                deleteFileFromS3(oldImageUrl);
+            }
+
+            return newImageUrl;
+        } catch (IOException e) {
+            throw new ImageUpdateException("Failed to update the plant image");
+        }
+    }
+
+    private void deleteFileFromS3(String imageUrl) {
+        // Extract the S3 path from the image URL
+        String s3Path = imageUrl.replace("https://" + bucketName + ".s3.amazonaws.com/", "");
+
+        // Delete the file from Amazon S3
+        s3client.deleteObject(bucketName, s3Path);
+    }
+
 
     /**
      * Deletes a plant from the database by its ID.
