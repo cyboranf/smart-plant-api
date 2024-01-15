@@ -4,13 +4,21 @@ import com.example.smartplantbuddy.dto.plant.PlantRequestDTO;
 import com.example.smartplantbuddy.dto.plant.PlantResponseDTO;
 import com.example.smartplantbuddy.model.Plant;
 import com.example.smartplantbuddy.model.User;
+import com.example.smartplantbuddy.repository.UserRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
 @Component
 public class PlantMapper {
+    private final UserRepository userRepository;
+
+    public PlantMapper(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     public Plant toEntity(PlantRequestDTO dto) {
         Plant plant = new Plant();
 
@@ -23,8 +31,13 @@ public class PlantMapper {
         plant.setFertilizingFrequency(dto.getFertilizingFrequency());
         plant.setDescription(dto.getDescription());
         plant.setFertilizingTime(dto.getFertilizingTime());
+        User user = userRepository.findById(dto.getUserId()).orElse(null);
+        if (user != null) {
+            plant.setUsers(new HashSet<>(Collections.singletonList(user)));
+        }
 
         return plant;
+
     }
 
     public PlantResponseDTO toDTO(Plant plant) {
