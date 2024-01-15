@@ -24,9 +24,6 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class UserService {
-    /*
-        TODO: Add validation after Postman Testing
-     */
     private final UserRepository userRepository;
     private final InvitationRepository invitationRepository;
     private final UserMapper userMapper;
