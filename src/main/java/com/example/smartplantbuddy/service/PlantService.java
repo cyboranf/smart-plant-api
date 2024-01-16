@@ -10,6 +10,7 @@ import com.example.smartplantbuddy.exception.gallery.ImageUpdateException;
 import com.example.smartplantbuddy.exception.plant.ImageEmptyException;
 import com.example.smartplantbuddy.exception.plant.PlantNotFoundException;
 import com.example.smartplantbuddy.exception.user.UserNotFoundException;
+import com.example.smartplantbuddy.exception.user.UsernameNotFoundException;
 import com.example.smartplantbuddy.mapper.CommentMapper;
 import com.example.smartplantbuddy.mapper.NoteMapper;
 import com.example.smartplantbuddy.mapper.PlantMapper;
@@ -26,9 +27,7 @@ import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -84,7 +83,17 @@ public class PlantService {
         Plant plant = plantMapper.toEntity(requestDTO);
         plant.setImageUrl(s3Path);
 
+        // Fetch the user and add the plant to the user's set of plants
+        User user = userRepository.findById(requestDTO.getUserId())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + requestDTO.getUserId()));
+        user.getPlants().add(plant); // Add the new plant to the user's set of plants
+
+        // Link back the plant to the user (important for bidirectional relationship)
+        plant.setUsers(new HashSet<>(Collections.singletonList(user)));
+
+        // Save both the plant and the user to ensure consistency in the relationship
         Plant savedPlant = plantRepository.save(plant);
+        userRepository.save(user);
 
         return plantMapper.toDTO(savedPlant);
     }
@@ -125,11 +134,17 @@ public class PlantService {
      *
      * @return A list of DTOs representing all plants.
      */
-    //TODO: Add randoms to list when user doesnt have an account
-    public List<PlantResponseDTO> getPlants() {
-        return plantRepository.findAll().stream()
-                .map(plantMapper::toDTO)
-                .collect(Collectors.toList());
+    public List<PlantResponseDTO> getPlantsForUser(String username) {
+        User user = userRepository.findByLogin(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Can not found User with login = " + username)); // Assuming this method exists
+        if (user != null) {
+            return user.getPlants().stream()
+                    .map(plantMapper::toDTO)
+                    .collect(Collectors.toList());
+        } else {
+            // Handle the case where the user is not found
+            return new ArrayList<>();
+        }
     }
 
     /**
@@ -257,6 +272,7 @@ public class PlantService {
 
     /**
      * Retrieves notes on plants owned by a user's friends.
+     *
      * @param userId The ID of the user whose friends' plant notes are to be retrieved.
      * @return A list of NoteResponseDTO representing the notes on the plants of the user's friends.
      * @throws UserNotFoundException if the user is not found in the database.
@@ -270,8 +286,10 @@ public class PlantService {
                 .map(noteMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
     /**
      * Retrieves comments on plants owned by a user's friends.
+     *
      * @param userId The ID of the user whose friends' plant comments are to be retrieved.
      * @return A list of CommentResponseDTO representing the comments on the plants of the user's friends.
      * @throws UserNotFoundException if the user is not found in the database.

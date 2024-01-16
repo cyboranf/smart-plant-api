@@ -94,7 +94,7 @@ public class PlantServiceTest {
         when(plantRepository.findAll()).thenReturn(Arrays.asList(plant));
         when(plantMapper.toDTO(plant)).thenReturn(responseDTO);
 
-        List<PlantResponseDTO> results = plantService.getPlants();
+        List<PlantResponseDTO> results = plantService.getPlantsForUser("username");
 
         assertNotNull(results);
         assertFalse(results.isEmpty());

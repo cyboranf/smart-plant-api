@@ -8,12 +8,14 @@ import com.example.smartplantbuddy.exception.plant.ImageEmptyException;
 import com.example.smartplantbuddy.exception.plant.PlantNotFoundException;
 import com.example.smartplantbuddy.model.User;
 import com.example.smartplantbuddy.repository.UserRepository;
+import com.example.smartplantbuddy.security.JwtTokenProvider;
 import com.example.smartplantbuddy.service.NoteService;
 import com.example.smartplantbuddy.service.PlantService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,11 +37,13 @@ import java.util.NoSuchElementException;
 @RestController
 @RequestMapping("/api/plant")
 public class PlantController {
+    private final JwtTokenProvider jwtTokenProvider;
     private final PlantService plantService;
     private final NoteService noteService;
     private final UserRepository userRepository;
 
-    public PlantController(PlantService plantService, NoteService noteService, UserRepository userRepository) {
+    public PlantController(JwtTokenProvider jwtTokenProvider, PlantService plantService, NoteService noteService, UserRepository userRepository) {
+        this.jwtTokenProvider = jwtTokenProvider;
         this.plantService = plantService;
         this.noteService = noteService;
         this.userRepository = userRepository;
@@ -83,9 +87,24 @@ public class PlantController {
      * @return A ResponseEntity containing a list of PlantResponseDTOs.
      */
     @GetMapping("/all")
-    public ResponseEntity<List<PlantResponseDTO>> showAll() {
-        List<PlantResponseDTO> plants = plantService.getPlants();
-        return ResponseEntity.ok(plants);
+    public ResponseEntity<List<PlantResponseDTO>> showAllForCurrentUser(HttpServletRequest request) {
+        String token = jwtTokenProvider.resolveToken(request);
+        if (token != null && jwtTokenProvider.validateToken(token)) {
+            Authentication authentication = jwtTokenProvider.getAuthentication(token);
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            String currentUsername = userDetails.getUsername();
+            List<PlantResponseDTO> plants = plantService.getPlantsForUser(currentUsername);
+            return ResponseEntity.ok(plants);
+        } else {
+            // Handle the case where the token is not valid or not present
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+    private String getCurrentUsername() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getName();
     }
 
     /**

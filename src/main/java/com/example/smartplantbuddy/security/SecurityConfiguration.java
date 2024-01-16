@@ -38,6 +38,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 
                 .antMatchers(HttpMethod.POST, "/api/login").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/logout").hasAuthority("USER")
                 .antMatchers(HttpMethod.POST, "/api/signup").permitAll()
 
                 .antMatchers(HttpMethod.GET, "/api/user/friends/{userId}").hasAuthority("USER")

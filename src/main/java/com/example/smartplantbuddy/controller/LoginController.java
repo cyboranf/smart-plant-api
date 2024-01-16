@@ -63,4 +63,26 @@ public class LoginController {
 
         return ResponseEntity.ok(loginResponseDTO);
     }
+
+    /**
+     * Logs out a user by clearing the JWT cookie.
+     * This method doesn't invalidate the JWT but removes it from the client-side,
+     * preventing its use in future requests.
+     *
+     * @param response The HttpServletResponse used for clearing the JWT cookie.
+     * @return A ResponseEntity indicating the operation's success or failure.
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<?> logoutUser(HttpServletResponse response) {
+        Cookie jwtCookie = new Cookie("role", null); // Set cookie value to null
+
+        jwtCookie.setSecure(true);
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(0); // Set cookie expiration to immediate
+
+        response.addCookie(jwtCookie);
+
+        return ResponseEntity.ok("Logged out successfully.");
+    }
 }
