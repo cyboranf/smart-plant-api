@@ -30,12 +30,12 @@ Here are some videos related to the project:
 
 <details>
   <summary>Video 1</summary>
-
-[![Video 1](readme/vid_thumbnail_1.png)](readme/vid.webm)
+  
+  Unfortunately, GitHub does not support embedding videos directly into README files. However, you can view Video 1 [here](readme/vid.webm).
 </details>
 
 <details>
   <summary>Video 2</summary>
-
-[![Video 2](readme/vid_thumbnail_2.png)](readme/vid_2.webm)
+  
+  Unfortunately, GitHub does not support embedding videos directly into README files. However, you can view Video 2 [here](readme/vid_2.webm).
 </details>
