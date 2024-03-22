@@ -1,8 +1,8 @@
 cloud:
   aws:
     credentials:
-      access-key: AKIAQRASRCD4NAEZCHU5
-      secret-key: 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
+      access-key:
+      secret-key:
     region:
       static: eu-north-1
     stack:
@@ -10,7 +10,7 @@ cloud:
 
 application:
   bucket:
-    name: smart-plant
+    name:
 
 spring:
   servlet:
